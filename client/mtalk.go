@@ -72,7 +72,7 @@ func NewMTalkCon(device *firebase_api.FirebaseDevice) (*MTalkCon, error) {
 		device.MTalkAuthSecret = base64.RawURLEncoding.EncodeToString(authSecret)
 	}
 	if device.MTalkPrivateKey != "" {
-		privateKeyBytes, err := base64.RawURLEncoding.DecodeString(device.MTalkAuthSecret)
+		privateKeyBytes, err := base64.RawURLEncoding.DecodeString(device.MTalkPrivateKey)
 		if err != nil {
 			err = fmt.Errorf("base64.RawURLEncoding.DecodeString[privateKey]: %w", err)
 			return nil, err
@@ -89,7 +89,7 @@ func NewMTalkCon(device *firebase_api.FirebaseDevice) (*MTalkCon, error) {
 			err = fmt.Errorf("ecdh.P256().GenerateKey: %w", err)
 			return nil, err
 		}
-		device.MTalkPublicKey = base64.RawURLEncoding.EncodeToString(privateKey.Bytes())
+		device.MTalkPrivateKey = base64.RawURLEncoding.EncodeToString(privateKey.Bytes())
 		device.MTalkPublicKey = base64.RawURLEncoding.EncodeToString(privateKey.PublicKey().Bytes())
 	}
 
@@ -211,7 +211,7 @@ func (c *MTalkCon) defaultOnMessage(msg proto.Message) {
 				cryptoKeyAppDataDecoded := parseAppDataValue(cryptoKeyAppData)
 				dhStr, ok := cryptoKeyAppDataDecoded["dh"]
 				if ok {
-					encryptionParams.DH, err = base64.RawURLEncoding.DecodeString(dhStr)
+					encryptionParams.DH, err = base64.RawURLEncoding.DecodeString(strings.TrimSuffix(dhStr, "="))
 					if err != nil {
 						err = fmt.Errorf("base64.RawURLEncoding.DecodeString[%s:dh]: %w", string(encryptionParams.Version), err)
 						panic(err)
@@ -446,8 +446,8 @@ func parseAppDataValue(value string) map[string]string {
 
 		kv := strings.SplitN(pair, "=", 2)
 		if len(kv) == 2 {
-			key := kv[0]
-			val := kv[1]
+			key := strings.TrimSpace(kv[0])
+			val := strings.TrimSpace(kv[1])
 			result[key] = val
 		}
 	}
