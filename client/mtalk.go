@@ -8,17 +8,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	firebase_api "github.com/BRUHItsABunny/go-android-firebase/api"
-	"github.com/BRUHItsABunny/go-android-firebase/constants"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/xakep666/ecego"
-	"go.uber.org/atomic"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"net"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/BRUHItsABunny/ecego"
+	firebase_api "github.com/BRUHItsABunny/go-android-firebase/api"
+	"github.com/BRUHItsABunny/go-android-firebase/constants"
+	"github.com/davecgh/go-spew/spew"
+	"go.uber.org/atomic"
+	"google.golang.org/protobuf/proto"
 )
 
 type MTalkMessageProcessor func(message proto.Message)
