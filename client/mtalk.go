@@ -2,8 +2,6 @@ package firebase_client
 
 import (
 	"crypto/ecdh"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
@@ -11,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math/big"
 	"net"
 	"strconv"
 	"strings"
@@ -97,14 +94,7 @@ func NewMTalkCon(device *firebase_api.FirebaseDevice) (*MTalkCon, error) {
 		device.MTalkPublicKey = base64.RawURLEncoding.EncodeToString(privateKey.PublicKey().Bytes())
 	}
 
-	curve := elliptic.P256()
-	privBytes := privateKey.Bytes()
-	ecdsaKey := new(ecdsa.PrivateKey)
-	ecdsaKey.PublicKey.Curve = curve
-	ecdsaKey.D = new(big.Int).SetBytes(privBytes)
-	ecdsaKey.PublicKey.X, ecdsaKey.PublicKey.Y = curve.ScalarBaseMult(privBytes)
-
-	result.ECEEngine = ecego.NewEngine(ecego.SingleKey(ecdsaKey), ecego.WithAuthSecret(authSecret))
+	result.ECEEngine = ecego.NewEngine(ecego.SingleKey(privateKey), ecego.WithAuthSecret(authSecret))
 	return result, nil
 }
 
